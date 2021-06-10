@@ -1,11 +1,12 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 import time
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
-USERNAME = input("Enter your Codeforce Handle/Email: ")
-PASSWORD = input("Enter your password: ")
+USERNAME = input("Enter your Handle/Email: ")
+PASSWORD = input("Enter your Password: ")
 
 path = "chromedriver.exe"
 
@@ -29,26 +30,22 @@ time.sleep(5)
 contest_menu = driver.find_element_by_xpath('//*[@id="body"]/div[3]/div[5]/ul/li[3]/a')
 contest_menu.click()
 
-# //*[@id="pageContent"]/div[1]/div[1]/div[6]/table/tbody/tr[2]/td[6]/a[1]
-for i in range(2,5):
-    time.sleep(5)
-    check = True
-    try:
-        path = f'//*[@id="pageContent"]/div[1]/div[1]/div[6]/table/tbody/tr[{i}]/td[6]/a[1]'
-        register_menu = driver.find_element_by_xpath(path)
-        register_menu.click()
+contest_link = driver.find_elements_by_link_text('Register »')
 
-        time.sleep(3)
+for contest in contest_link:
+    wait = WebDriverWait(driver, 10)
+    element = wait.until(EC.element_to_be_clickable((By.LINK_TEXT , 'Register »')))
 
-        register_button = driver.find_element_by_xpath('//*[@id="pageContent"]/form/table/tbody/tr[3]/td/div/input')
+    element.click()
+    time.sleep(2)
+    submit = driver.find_element_by_css_selector('input.submit')
+    CurrentUrl = driver.current_url
+    submit.click()
+    time.sleep(2)
 
-    except NoSuchElementException:
+    if CurrentUrl == driver.current_url:
         driver.back()
         continue
-    else:
-        #page_content = driver.find_element_by_css_selector("#pageContent h2")
-        #print(page_content.text)
-        register_button.click()
-        continue
+    else: continue
 
 driver.quit()
